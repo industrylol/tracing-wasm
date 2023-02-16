@@ -25,6 +25,38 @@ extern "C" {
     fn log3(message1: &str, message2: &str, message3: &str);
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn log4(message1: String, message2: &str, message3: &str, message4: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = debug)]
+    fn debug1(message: String);
+    #[wasm_bindgen(js_namespace = console, js_name = debug)]
+    fn debug2(message1: &str, message2: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = debug)]
+    fn debug3(message1: &str, message2: &str, message3: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = debug)]
+    fn debug4(message1: String, message2: &str, message3: &str, message4: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = warn)]
+    fn warn1(message: String);
+    #[wasm_bindgen(js_namespace = console, js_name = warn)]
+    fn warn2(message1: &str, message2: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = warn)]
+    fn warn3(message1: &str, message2: &str, message3: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = warn)]
+    fn warn4(message1: String, message2: &str, message3: &str, message4: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = error)]
+    fn error1(message: String);
+    #[wasm_bindgen(js_namespace = console, js_name = error)]
+    fn error2(message1: &str, message2: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = error)]
+    fn error3(message1: &str, message2: &str, message3: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = error)]
+    fn error4(message1: String, message2: &str, message3: &str, message4: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = info)]
+    fn info1(message: String);
+    #[wasm_bindgen(js_namespace = console, js_name = info)]
+    fn info2(message1: &str, message2: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = info)]
+    fn info3(message1: &str, message2: &str, message3: &str);
+    #[wasm_bindgen(js_namespace = console, js_name = info)]
+    fn info4(message1: String, message2: &str, message3: &str, message4: &str);
 }
 
 #[cfg(test)]
@@ -308,7 +340,14 @@ impl<S: Subscriber + for<'a> LookupSpan<'a>> Layer<S> for WASMLayer {
                     .unwrap_or_default();
 
                 if self.config.use_console_color {
-                    log4(
+                    let log = match level {
+                        &tracing::Level::TRACE => info4,
+                        &tracing::Level::DEBUG => debug4,
+                        &tracing::Level::INFO => log4,
+                        &tracing::Level::WARN => warn4,
+                        &tracing::Level::ERROR => error4,
+                    };
+                    log(
                         format!(
                             "%c{}%c {}{}%c{}",
                             level,
@@ -327,7 +366,14 @@ impl<S: Subscriber + for<'a> LookupSpan<'a>> Layer<S> for WASMLayer {
                         "color: inherit",
                     );
                 } else {
-                    log1(format!(
+                    let log = match level {
+                        &tracing::Level::TRACE => info1,
+                        &tracing::Level::DEBUG => debug1,
+                        &tracing::Level::INFO => log1,
+                        &tracing::Level::WARN => warn1,
+                        &tracing::Level::ERROR => error1,
+                    };
+                    log(format!(
                         "{} {}{} {}",
                         level,
                         origin,
